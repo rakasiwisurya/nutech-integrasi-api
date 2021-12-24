@@ -90,3 +90,90 @@ exports.getProducts = async (req, res) => {
     });
   }
 };
+
+exports.getProduct = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    let data = await product.findOne({
+      where: {
+        id,
+      },
+      include: {
+        model: user,
+        as: "user",
+        attributes: {
+          exclude: ["createdAt", "updatedAt", "password", "role"],
+        },
+      },
+      attributes: {
+        exclude: ["createdAt", "updatedAt", "userId"],
+      },
+    });
+
+    data = JSON.parse(JSON.stringify(data));
+
+    const newData = {
+      ...data,
+      imageUrl: process.env.PATH_IMAGE + data.image,
+    };
+
+    res.send({
+      status: "Success",
+      data: newData,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      status: "Failed",
+      message: "Server error",
+    });
+  }
+};
+
+exports.updateProduct = async (req, res) => {
+  const { id } = req.params;
+
+  let body;
+  if (req.file) {
+    body = { ...req.body, image: req.file.filename };
+  } else {
+    body = req.body;
+  }
+
+  try {
+    await product.update(body, {
+      where: {
+        id,
+      },
+    });
+
+    const data = await product.findOne({
+      where: {
+        id,
+      },
+      include: {
+        model: user,
+        as: "user",
+        attributes: {
+          exclude: ["createdAt", "updatedAt", "password", "role"],
+        },
+      },
+      attributes: {
+        exclude: ["createdAt", "updatedAt", "userId"],
+      },
+    });
+
+    res.send({
+      status: "Success",
+      message: "Data successfully updated",
+      data,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      status: "Failed",
+      message: "Server error",
+    });
+  }
+};
