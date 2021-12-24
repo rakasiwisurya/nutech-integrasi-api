@@ -58,7 +58,7 @@ exports.addProduct = async (req, res) => {
 
 exports.getProducts = async (req, res) => {
   try {
-    const data = await product.findAll({
+    let data = await product.findAll({
       include: {
         model: user,
         as: "user",
@@ -71,9 +71,16 @@ exports.getProducts = async (req, res) => {
       },
     });
 
+    data = JSON.parse(JSON.stringify(data));
+
+    const newData = data.map((item) => ({
+      ...item,
+      image: process.env.PATH_IMAGE + item.image,
+    }));
+
     res.send({
       status: "Success",
-      data,
+      data: newData,
     });
   } catch (error) {
     console.log(error);
