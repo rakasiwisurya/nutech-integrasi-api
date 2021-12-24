@@ -190,3 +190,36 @@ exports.updateProduct = async (req, res) => {
     });
   }
 };
+
+exports.deleteProduct = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const data = await product.findOne({
+      where: {
+        id,
+      },
+    });
+
+    unlink("uploads/" + data.image, (error) => {
+      if (error) throw error;
+    });
+
+    await product.destroy({
+      where: {
+        id,
+      },
+    });
+
+    res.send({
+      status: "Success",
+      message: "Data successfully deleted",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      status: "Failed",
+      message: "Server error",
+    });
+  }
+};

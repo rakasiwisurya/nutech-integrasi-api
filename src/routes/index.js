@@ -7,6 +7,7 @@ const {
   getProducts,
   getProduct,
   updateProduct,
+  deleteProduct,
 } = require("../controllers/product");
 
 const { auth } = require("../middlewares/auth");
@@ -24,5 +25,6 @@ router.put(
   uploadFile("image", "uploads"),
   updateProduct
 );
+router.delete("/products/:id", auth, deleteProduct);
 
 module.exports = router;
