@@ -21,6 +21,19 @@ exports.addProduct = async (req, res) => {
   }
 
   try {
+    const productData = await product.findOne({
+      where: {
+        name: req.body.name,
+      },
+    });
+
+    if (productData) {
+      return res.status(400).send({
+        status: "Failed",
+        message: "Product already exist",
+      });
+    }
+
     const newProduct = await product.create({
       ...req.body,
       userId: req.user.id,
