@@ -1,4 +1,5 @@
 const { product, user } = require("../../models");
+const { unlink } = require("fs");
 const Joi = require("joi");
 
 exports.addProduct = async (req, res) => {
@@ -142,6 +143,18 @@ exports.updateProduct = async (req, res) => {
   }
 
   try {
+    const getData = await product.findOne({
+      where: {
+        id,
+      },
+    });
+
+    if (req.file) {
+      unlink("uploads/" + getData.image, (error) => {
+        if (error) throw error;
+      });
+    }
+
     await product.update(body, {
       where: {
         id,
