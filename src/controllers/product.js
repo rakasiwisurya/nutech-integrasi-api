@@ -108,7 +108,7 @@ exports.searchProduct = async (req, res) => {
 
     res.send({
       status: "Success",
-      newData,
+      data: newData,
     });
   } catch (error) {
     console.log(error);
