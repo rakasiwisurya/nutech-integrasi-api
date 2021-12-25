@@ -41,12 +41,10 @@ exports.addProduct = async (req, res) => {
       unique_filename: false,
     });
 
-    const splitFilename = result.public_id.split("/")[1];
-
     const newProduct = await product.create({
       ...req.body,
       userId: req.user.id,
-      image: splitFilename,
+      image: result.public_id,
     });
 
     const data = await product.findOne({
