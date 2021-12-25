@@ -202,14 +202,14 @@ exports.deleteProduct = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const data = product.findOne({
+    const data = await product.findOne({
       where: {
         id,
       },
     });
 
-    await cloudinary.uploader.destroy(data.image, function (result) {
-      console.log(result);
+    await cloudinary.uploader.destroy(data.image, function (result, error) {
+      console.log(result, error);
     });
 
     await product.destroy({
