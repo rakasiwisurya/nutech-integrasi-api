@@ -1,5 +1,4 @@
 const { product, user } = require("../../models");
-const { unlink, unlinkSync } = require("fs");
 const Joi = require("joi");
 const cloudinary = require("../../third-party/cloudinary");
 
@@ -96,7 +95,7 @@ exports.getProducts = async (req, res) => {
 
     const newData = data.map((item) => ({
       ...item,
-      image: cloudinary.url(item.image),
+      image: cloudinary.secure_url(item.image),
     }));
 
     res.send({
@@ -203,6 +202,16 @@ exports.deleteProduct = async (req, res) => {
   const { id } = req.params;
 
   try {
+    const data = product.findOne({
+      where: {
+        id,
+      },
+    });
+
+    await cloudinary.uploader.destroy(data.image, function (result) {
+      console.log(result);
+    });
+
     await product.destroy({
       where: {
         id,
