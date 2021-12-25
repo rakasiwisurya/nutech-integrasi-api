@@ -154,14 +154,20 @@ exports.getProduct = async (req, res) => {
 exports.updateProduct = async (req, res) => {
   const { id } = req.params;
 
-  let body;
-  if (req.file) {
-    body = { ...req.body, image: req.file.filename };
-  } else {
-    body = req.body;
-  }
-
   try {
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: "nutech_itegrasi_files",
+      use_filename: true,
+      unique_filename: false,
+    });
+
+    let body;
+    if (req.file) {
+      body = { ...req.body, image: result.public_id };
+    } else {
+      body = req.body;
+    }
+
     if (req.file) {
       const getData = await product.findOne({
         where: {
