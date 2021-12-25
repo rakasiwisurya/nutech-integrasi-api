@@ -95,7 +95,7 @@ exports.getProducts = async (req, res) => {
 
     const newData = data.map((item) => ({
       ...item,
-      image: cloudinary.secure_url(item.image),
+      image: cloudinary.url(item.image),
     }));
 
     res.send({
