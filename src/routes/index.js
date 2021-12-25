@@ -8,6 +8,7 @@ const {
   getProduct,
   updateProduct,
   deleteProduct,
+  searchProduct,
 } = require("../controllers/product");
 
 const { auth } = require("../middlewares/auth");
@@ -17,6 +18,7 @@ router.post("/login", login);
 router.get("/check-auth", auth, checkAuth);
 
 router.post("/products", auth, uploadFile("image", "uploads"), addProduct);
+router.get("/products/search", auth, searchProduct);
 router.get("/products", auth, getProducts);
 router.get("/products/:id", auth, getProduct);
 router.put(

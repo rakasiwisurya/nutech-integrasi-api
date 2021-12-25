@@ -1,6 +1,7 @@
 const { product, user } = require("../../models");
 const Joi = require("joi");
 const cloudinary = require("../../third-party/cloudinary");
+const { Op } = require("sequelize");
 
 exports.addProduct = async (req, res) => {
   const schema = Joi.object({
@@ -66,6 +67,48 @@ exports.addProduct = async (req, res) => {
       status: "Success",
       message: "Data successfully added",
       data,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      status: "Failed",
+      message: "Server error",
+    });
+  }
+};
+
+exports.searchProduct = async (req, res) => {
+  const { name } = req.query;
+
+  try {
+    let data = await product.findAll({
+      where: {
+        name: {
+          [Op.substring]: name,
+        },
+      },
+      include: {
+        model: user,
+        as: "user",
+        attributes: {
+          exclude: ["createdAt", "updatedAt", "password", "role"],
+        },
+      },
+      attributes: {
+        exclude: ["createdAt", "updatedAt", "userId"],
+      },
+    });
+
+    data = JSON.parse(JSON.stringify(data));
+
+    const newData = data.map((item) => ({
+      ...item,
+      image: cloudinary.url(item.image),
+    }));
+
+    res.send({
+      status: "Success",
+      newData,
     });
   } catch (error) {
     console.log(error);
