@@ -1,6 +1,7 @@
 const { product, user } = require("../../models");
-const { unlink } = require("fs");
+const { unlink, unlinkSync } = require("fs");
 const Joi = require("joi");
+const cloudinary = require("../../third-party/cloudinary");
 
 exports.addProduct = async (req, res) => {
   const schema = Joi.object({
@@ -34,10 +35,18 @@ exports.addProduct = async (req, res) => {
       });
     }
 
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: "nutech_itegrasi_files",
+      use_filename: true,
+      unique_filename: false,
+    });
+
+    const splitFilename = result.public_id.split("/")[1];
+
     const newProduct = await product.create({
       ...req.body,
       userId: req.user.id,
-      image: req.file.filename,
+      image: splitFilename,
     });
 
     const data = await product.findOne({
@@ -89,7 +98,7 @@ exports.getProducts = async (req, res) => {
 
     const newData = data.map((item) => ({
       ...item,
-      image: process.env.PATH_IMAGE + item.image,
+      image: cloudinary.url(item.image),
     }));
 
     res.send({
@@ -129,7 +138,7 @@ exports.getProduct = async (req, res) => {
 
     const newData = {
       ...data,
-      imageUrl: process.env.PATH_IMAGE + data.image,
+      imageUrl: cloudinary.url(data.image),
     };
 
     res.send({
@@ -156,18 +165,6 @@ exports.updateProduct = async (req, res) => {
   }
 
   try {
-    const getData = await product.findOne({
-      where: {
-        id,
-      },
-    });
-
-    if (req.file) {
-      unlink("uploads/" + getData.image, (error) => {
-        if (error) throw error;
-      });
-    }
-
     await product.update(body, {
       where: {
         id,
@@ -208,16 +205,6 @@ exports.deleteProduct = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const data = await product.findOne({
-      where: {
-        id,
-      },
-    });
-
-    unlink("uploads/" + data.image, (error) => {
-      if (error) throw error;
-    });
-
     await product.destroy({
       where: {
         id,
