@@ -162,6 +162,21 @@ exports.updateProduct = async (req, res) => {
   }
 
   try {
+    if (req.file) {
+      const getData = await product.findOne({
+        where: {
+          id,
+        },
+      });
+
+      await cloudinary.uploader.destroy(
+        getData.image,
+        function (result, error) {
+          console.log(result, error);
+        }
+      );
+    }
+
     await product.update(body, {
       where: {
         id,
