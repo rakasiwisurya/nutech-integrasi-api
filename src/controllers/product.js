@@ -84,9 +84,10 @@ exports.searchProduct = async (req, res) => {
     let data = await product.findAll({
       where: {
         name: {
-          [Op.substring]: name,
+          [Op.iLike]: name,
         },
       },
+      order: [["createdAt", "ASC"]],
       include: {
         model: user,
         as: "user",
@@ -122,6 +123,7 @@ exports.searchProduct = async (req, res) => {
 exports.getProducts = async (req, res) => {
   try {
     let data = await product.findAll({
+      order: [["createdAt", "ASC"]],
       include: {
         model: user,
         as: "user",
