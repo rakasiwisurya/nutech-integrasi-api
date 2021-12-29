@@ -200,14 +200,15 @@ exports.updateProduct = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const result = await cloudinary.uploader.upload(req.file.path, {
-      folder: "nutech_itegrasi_files",
-      use_filename: true,
-      unique_filename: false,
-    });
-
     let body;
+
     if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "nutech_itegrasi_files",
+        use_filename: true,
+        unique_filename: false,
+      });
+
       body = { ...req.body, image: result.public_id };
     } else {
       body = req.body;
