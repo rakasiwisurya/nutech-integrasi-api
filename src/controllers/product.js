@@ -84,7 +84,7 @@ exports.searchProduct = async (req, res) => {
     let data = await product.findAll({
       where: {
         name: {
-          [Op.like]: `%${name}%`,
+          [Op.iLike]: `%${name}%`,
         },
       },
       order: [["createdAt", "ASC"]],
